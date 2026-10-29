@@ -1,0 +1,14 @@
+const U="/people",$=id=>document.getElementById(id),f=$("personForm"),pid=$("personId"),n=$("name"),b=$("balance"),t=$("peopleTable"),sb=$("submitButton"),cb=$("cancelButton"),ft=$("formTitle"),m=$("message");let p=[];
+const fm=v=>Number(v).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+async function rq(a,o={}){const r=await fetch(a,{...o,headers:{"Content-Type":"application/json",...o.headers}}),d=await r.json();if(!r.ok)throw Error(d.message||"حدث خطأ");return d}
+function w(x,ty="success"){m.textContent=x;m.className="message "+ty;if(ty==="success")setTimeout(()=>m.className="message",3500)}
+function us(){const tot=p.reduce((s,x)=>s+Number(x.balance),0);$("peopleCount").textContent=p.length;$("totalBalance").textContent=fm(tot);$("averageBalance").textContent=fm(p.length?tot/p.length:0)}
+function cc(v,c=""){const d=document.createElement("td");d.textContent=v;if(c)d.className=c;return d}
+function cab(l,c,fn){const d=document.createElement("button");d.type="button";d.textContent=l;d.className=c;d.onclick=fn;return d}
+function rp(){t.replaceChildren();if(!p.length){const r=document.createElement("tr"),d=document.createElement("td");d.colSpan=4;d.className="empty";d.textContent="لا توجد بيانات حتى الآن";r.appendChild(d);t.appendChild(r);us();return}p.forEach((x,i)=>{const r=document.createElement("tr"),ac=document.createElement("td"),ad=document.createElement("div");ad.className="actions";ad.append(cab("تعديل","secondary",()=>ep(x)),cab("حذف","danger",()=>dp(x)));r.append(cc(i+1),cc(x.name),cc(fm(x.balance),"balance"));ac.appendChild(ad);r.appendChild(ac);t.appendChild(r)});us()}
+async function lp(){try{const r=await rq(U);p=r.data;rp()}catch(x){t.replaceChildren();const r=document.createElement("tr"),d=document.createElement("td");d.colSpan=4;d.className="empty";d.textContent=x.message;r.appendChild(d);t.appendChild(r);w(x.message,"error")}}
+function rf(){f.reset();pid.value="";b.value="0";ft.textContent="إضافة شخص جديد";sb.textContent="إضافة";cb.hidden=true}
+function ep(x){pid.value=x.id;n.value=x.name;b.value=Number(x.balance);ft.textContent="تعديل بيانات الشخص";sb.textContent="حفظ";cb.hidden=false;f.scrollIntoView({behavior:"smooth",block:"center"});n.focus()}
+async function dp(x){if(!confirm('هل أنت متأكد من حذف "'+x.name+'"؟'))return;try{await rq(U+"/"+x.id,{method:"DELETE"});w("تم حذف الشخص بنجاح");await lp()}catch(e){w(e.message,"error")}}
+f.onsubmit=async ev=>{ev.preventDefault();const nm=n.value.trim(),ba=Number(b.value),id=pid.value;if(!nm)return w("من فضلك أدخل اسم الشخص","error");if(b.value.trim()===""||!isFinite(ba)||ba<0||ba>9999999999.99)return w("أدخل رصيدًا صحيحًا","error");sb.disabled=true;try{await rq(id?U+"/"+id:U,{method:id?"PUT":"POST",body:JSON.stringify({name:nm,balance:ba})});w(id?"تم تعديل البيانات بنجاح":"تمت إضافة الشخص بنجاح");rf();await lp()}catch(e){w(e.message,"error")}finally{sb.disabled=false}};
+cb.onclick=rf;lp();
