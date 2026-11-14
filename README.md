@@ -35,5 +35,5 @@
 2. جهّز قاعدة بيانات PostgreSQL باسم `fahd5_db`.
 3. راجع إعدادات الاتصال بقاعدة البيانات في ملف `.env`.
 4. شغّل المشروع باستخدام الأمر المتاح في `package.json`.
-
+https://www.linkedin.com/posts/mohamed-hussein7048_nodejs-expressjs-sqlserver-share-7527355959308980224-aOOg/
 ---
